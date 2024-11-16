@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome to Our App</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Modern landing page styles */
+        .welcome-container {
+            text-align: center;
+            padding: 60px 40px;
+            background: linear-gradient(to bottom right, #ffffff, #f8f9fa);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            max-width: 800px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .welcome-container:hover {
+            transform: translateY(-5px);
+        }
+
+        .welcome-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, #1a73e8, #34a853, #fbbc05, #ea4335);
+        }
+
+        .welcome-container h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 700;
+            text-transform: capitalize;
+            letter-spacing: -0.5px;
+        }
+
+        .welcome-container p {
+            color: #5f6368;
+            margin-bottom: 40px;
+            line-height: 1.8;
+            font-size: 1.1em;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .button-group button {
+            width: auto;
+            min-width: 160px;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .button-group button:first-child {
+            background: #1a73e8;
+            color: white;
+            border: none;
+            box-shadow: 0 4px 15px rgba(26, 115, 232, 0.2);
+        }
+
+        .button-group button:first-child:hover {
+            background: #1557b0;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26, 115, 232, 0.3);
+        }
+
+        .secondary-button {
+            background-color: white !important;
+            color: #1a73e8 !important;
+            border: 2px solid #1a73e8 !important;
+            box-shadow: 0 4px 15px rgba(26, 115, 232, 0.1);
+        }
+
+        .secondary-button:hover {
+            background-color: #f8f9fa !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26, 115, 232, 0.2) !important;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .welcome-container {
+                padding: 40px 20px;
+                margin: 20px;
+            }
+
+            .welcome-container h1 {
+                font-size: 2em;
+            }
+
+            .welcome-container p {
+                font-size: 1em;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .button-group button {
+                width: 100%;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .welcome-container {
+                background: linear-gradient(to bottom right, #2c3e50, #34495e);
+            }
+
+            .welcome-container h1 {
+                color: #ffffff;
+            }
+
+            .welcome-container p {
+                color: #ecf0f1;
+            }
+
+            .secondary-button {
+                background-color: transparent !important;
+                color: #ffffff !important;
+                border-color: #ffffff !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="welcome-container">
+            <h1>Welcome to Our Application</h1>
+            <p>Experience the best way to manage your tasks and stay organized. Join our community today!</p>
+            <div class="button-group">
+                <button onclick="window.location.href='register.html'">Register</button>
+                <button class="secondary-button" onclick="window.location.href='login.html'">Login</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is already logged in
+        window.onload = function() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                // Redirect to welcome page if already logged in
+                window.location.href = 'welcome.html';
+            } else {
+                // Redirect to register page if not logged in
+                window.location.href = 'register.html';
+            }
+        }
+    </script>
+</body>
+</html>

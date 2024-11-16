@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="welcome-content">
+            <h1>Welcome <span id="username"></span>!</h1>
+            <button onclick="window.location.href='dashboard.html'">Go to Dashboard</button>
+            <button onclick="logout()">Logout</button>
+        </div>
+    </div>
+    <script src="js/main.js"></script>
+    <script>
+        // Check authentication
+        const token = localStorage.getItem('token');
+        const username = localStorage.getItem('username');
+
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+
+        // Display username
+        document.getElementById('username').textContent = username;
+
+        // Add logout function
+        async function logout() {
+            try {
+                // Make logout request to backend
+                const response = await fetch('http://localhost:8000/api/logout/', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    console.warn('Logout request failed:', response.status);
+                }
+
+            } catch (error) {
+                console.warn('Error during logout:', error);
+            } finally {
+                // Clear all local storage
+                localStorage.clear();
+                
+                // Set a flag to show a message on the login page
+                sessionStorage.setItem('logoutSuccess', 'true');
+                
+                // Redirect to login page
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
+</body>
+</html>
