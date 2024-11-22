@@ -23,7 +23,7 @@ urlpatterns = [
     path('api/register/', views.register),
     path('api/login/', views.login),
     path('api/welcome/', views.welcome),
-    # Add to existing urlpatterns
+    path('api/tasks/<int:pk>/', views.task_detail, name='task-detail'),
 path('api/dashboard/stats/', views.dashboard_stats, name='dashboard-stats'),
 path('api/tasks/', views.task_list, name='task-list'),
 ]

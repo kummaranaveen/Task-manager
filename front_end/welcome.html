@@ -3,16 +3,170 @@
 <head>
     <title>Welcome</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .welcome-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .welcome-content h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .welcome-content button {
+            margin: 10px;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            width: auto;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .dashboard-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+        }
+
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+        }
+
+        .dashboard-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        #username {
+            color: #3498db;
+            font-weight: bold;
+            position: relative;
+            display: inline-block;
+        }
+
+        #username::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #3498db;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        #username:hover::after {
+            transform: scaleX(1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { 
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Loading animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .loading-overlay.show {
+            opacity: 1;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <div class="welcome-content">
-            <h1>Welcome <span id="username"></span>!</h1>
-            <button onclick="window.location.href='dashboard.html'">Go to Dashboard</button>
-            <button onclick="logout()">Logout</button>
+            <h1>Welcome, <span id="username"></span>!</h1>
+            <div class="button-group">
+                <button class="dashboard-btn" onclick="goToDashboard()">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Go to Dashboard
+                </button>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
         </div>
     </div>
-    <script src="js/main.js"></script>
+
+    <script src="https://kit.fontawesome.com/your-font-awesome-kit.js"></script>
     <script>
         // Check authentication
         const token = localStorage.getItem('token');
@@ -25,11 +179,24 @@
         // Display username
         document.getElementById('username').textContent = username;
 
-        // Add logout function
+        function showLoadingOverlay() {
+            const overlay = document.createElement('div');
+            overlay.className = 'loading-overlay';
+            overlay.innerHTML = '<div class="loading-spinner"></div>';
+            document.body.appendChild(overlay);
+            setTimeout(() => overlay.classList.add('show'), 10);
+        }
+
+        function goToDashboard() {
+            showLoadingOverlay();
+            window.location.href = 'dashboard.html';
+        }
+
         async function logout() {
             try {
-                // Make logout request to backend
-                const response = await fetch('http://localhost:8000/api/logout/', {
+                showLoadingOverlay();
+                
+                const response = await fetch('http://localhost:8000/api/auth/logout/', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -37,21 +204,23 @@
                     }
                 });
 
-                if (!response.ok) {
+                if (!response.ok && response.status !== 401) {
                     console.warn('Logout request failed:', response.status);
                 }
 
             } catch (error) {
                 console.warn('Error during logout:', error);
             } finally {
-                // Clear all local storage
                 localStorage.clear();
-                
-                // Set a flag to show a message on the login page
                 sessionStorage.setItem('logoutSuccess', 'true');
                 
-                // Redirect to login page
-                window.location.href = 'login.html';
+                // Add fade-out effect
+                document.body.style.opacity = '0';
+                document.body.style.transition = 'opacity 0.3s ease';
+                
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 300);
             }
         }
     </script>

@@ -167,16 +167,29 @@ async function updateTask(taskId, taskData) {
             body: JSON.stringify(taskData)
         });
 
-        if (!response.ok) throw new Error('Failed to update task');
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to update task');
+        }
 
-        await loadTasks();
+      
+        const updatedTask = await response.json();
+        const index = tasks.findIndex(t => t.id === taskId);
+        if (index !== -1) {
+            tasks[index] = updatedTask;
+        }
+
+       
+        displayTasks(tasks);
         await loadDashboard();
+        
+    
+        alert('Task updated successfully');
     } catch (error) {
         console.error('Error:', error);
-        alert('Failed to update task');
+        alert(error.message);
     }
 }
-
 async function deleteTask(taskId) {
     if (!confirm('Are you sure you want to delete this task?')) return;
 
@@ -184,20 +197,29 @@ async function deleteTask(taskId) {
         const response = await fetch(`http://localhost:8000/api/tasks/${taskId}/`, {
             method: 'DELETE',
             headers: {
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
             }
         });
 
-        if (!response.ok) throw new Error('Failed to delete task');
+        if (!response.ok) {
+            if (response.status === 404) {
+                throw new Error('Task not found');
+            }
+            throw new Error('Failed to delete task');
+        }
 
-        await loadTasks();
+        // Remove the task from the local array
+        tasks = tasks.filter(task => task.id !== taskId);
+        // Refresh the display
+        displayTasks(tasks);
+        // Refresh dashboard stats
         await loadDashboard();
     } catch (error) {
         console.error('Error:', error);
-        alert('Failed to delete task');
+        alert(error.message);
     }
 }
-
 // Modal handling
 function showAddTaskModal() {
     document.getElementById('modalTitle').textContent = 'Add New Task';
